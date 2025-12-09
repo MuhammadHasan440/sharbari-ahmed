@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { SectionContainer } from "@/components/section-container"
-import { ArrowRight, ChevronUp, BookOpen, Film, Mic, GraduationCap, Globe, Heart } from "lucide-react"
+import { ArrowRight, ChevronUp, BookOpen, Film, Mic, GraduationCap, Globe, Heart, Play, Pause, Volume2, VolumeX } from "lucide-react"
 
 // Import your author image - update the path to your actual image
 import authorImage from "@/public/images/author.jpeg" // Change this to your image path
@@ -14,6 +14,14 @@ import authorImage from "@/public/images/author.jpeg" // Change this to your ima
 export default function AboutPage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [floatingElements, setFloatingElements] = useState<Array<{left: string, top: string, delay: string, opacity: number}>>([])
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [isMuted, setIsMuted] = useState(true) // Start muted for autoplay
+  const [volume, setVolume] = useState(0.7)
+  
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const progressBarRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +38,29 @@ export default function AboutPage() {
     setFloatingElements(elements)
 
     window.addEventListener("scroll", handleScroll)
+    
+    // Initialize video controls
+    const video = videoRef.current
+    if (video) {
+      const handleTimeUpdate = () => setCurrentTime(video.currentTime)
+      const handleLoadedMetadata = () => setDuration(video.duration)
+      
+      video.addEventListener('timeupdate', handleTimeUpdate)
+      video.addEventListener('loadedmetadata', handleLoadedMetadata)
+      
+      // Try to autoplay (muted)
+      video.muted = true
+      video.play().catch(() => {
+        // Autoplay blocked, keep paused
+        setIsPlaying(false)
+      })
+
+      return () => {
+        video.removeEventListener('timeupdate', handleTimeUpdate)
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      }
+    }
+
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -38,6 +69,60 @@ export default function AboutPage() {
   }
 
   const tedxLink = "https://www.ted.com/talks/sharbari_ahmed_between_the_kabah_sharif_and_a_hard_place?utm_campaign=tedspread&utm_medium=referral&utm_source=tedcomshare"
+
+  const togglePlay = () => {
+    const video = videoRef.current
+    if (video) {
+      if (video.paused) {
+        video.play()
+        setIsPlaying(true)
+      } else {
+        video.pause()
+        setIsPlaying(false)
+      }
+    }
+  }
+
+  const toggleMute = () => {
+    const video = videoRef.current
+    if (video) {
+      video.muted = !video.muted
+      setIsMuted(video.muted)
+      if (!video.muted) {
+        setVolume(video.volume)
+      }
+    }
+  }
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value)
+    const video = videoRef.current
+    if (video) {
+      video.volume = newVolume
+      video.muted = newVolume === 0
+      setIsMuted(newVolume === 0)
+      setVolume(newVolume)
+    }
+  }
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const progressBar = progressBarRef.current
+    const video = videoRef.current
+    if (progressBar && video) {
+      const rect = progressBar.getBoundingClientRect()
+      const percent = (e.clientX - rect.left) / rect.width
+      video.currentTime = percent * duration
+      setCurrentTime(video.currentTime)
+    }
+  }
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
@@ -387,41 +472,117 @@ export default function AboutPage() {
               <p className="text-xl text-white/70">Exploring identity, spirituality, and inherited stories</p>
             </div>
 
-            {/* Video Embed */}
+            {/* YouTube-like Video Player */}
             <div className="relative group animate-slide-up">
               <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
-              <div className="relative aspect-video bg-gradient-to-br from-[#0A1128] via-[#1A237E] to-[#283593] rounded-xl overflow-hidden shadow-2xl">
-                {/* Video Frame */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  {/* YouTube Embed - Replace with actual embed code if available */}
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-center space-y-6 max-w-lg">
-                      <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 border-2 border-[#D4AF37]/30 flex items-center justify-center">
-                        <Mic className="text-[#D4AF37]" size={36} />
+              
+              <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-black">
+                {/* Video Container */}
+                <div className="relative w-full h-full">
+                  <video
+                    ref={videoRef}
+                    src="/images/kabah.mp4"
+                    className="w-full h-full object-cover"
+                    preload="metadata"
+                    muted={isMuted}
+                    playsInline
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  
+                  {/* Video Overlay - Shows when paused */}
+                  {!isPlaying && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-center justify-center">
+                      <div className="text-center space-y-6">
+                        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/80 to-[#FFD700]/80 flex items-center justify-center shadow-2xl">
+                          <Play size={36} className="text-[#0A1128] ml-1" />
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-lg font-bold text-white">Click to Play Preview</p>
+                          <p className="text-sm text-white/70">Watch the TEDx talk highlights</p>
+                        </div>
                       </div>
-                      <div className="space-y-3">
-                        <p className="text-lg text-white/70">Watch My TEDx Talk</p>
-                        <p className="text-sm text-white/50">Available on TED.com</p>
+                    </div>
+                  )}
+                  
+                  {/* Custom Video Controls */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                    {/* Progress Bar */}
+                    <div 
+                      ref={progressBarRef}
+                      className="h-1.5 bg-white/30 rounded-full mb-3 cursor-pointer"
+                      onClick={handleProgressClick}
+                    >
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full relative"
+                        style={{ width: `${progressPercent}%` }}
+                      >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg"></div>
                       </div>
+                    </div>
+                    
+                    {/* Controls Bar */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        {/* Play/Pause Button */}
+                        <button
+                          onClick={togglePlay}
+                          className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                        >
+                          {isPlaying ? (
+                            <Pause size={20} className="text-white" />
+                          ) : (
+                            <Play size={20} className="text-white ml-1" />
+                          )}
+                        </button>
+                        
+                        {/* Volume Control */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={toggleMute}
+                            className="w-8 h-8 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+                          >
+                            {isMuted || volume === 0 ? (
+                              <VolumeX size={16} className="text-white" />
+                            ) : (
+                              <Volume2 size={16} className="text-white" />
+                            )}
+                          </button>
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={isMuted ? 0 : volume}
+                            onChange={handleVolumeChange}
+                            className="w-24 accent-[#D4AF37] cursor-pointer"
+                          />
+                        </div>
+                        
+                        {/* Time Display */}
+                        <div className="text-sm text-white/80 font-mono">
+                          {formatTime(currentTime)} / {formatTime(duration)}
+                        </div>
+                      </div>
+                      
+                      {/* TED.com Link */}
                       <Link
                         href={tedxLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold rounded-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all duration-300"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold text-sm rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all"
                       >
-                        Watch on TED.com
-                        <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                        Watch Full Talk
+                        <ArrowRight size={14} />
                       </Link>
                     </div>
                   </div>
                   
-                  {/* Play Button Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#FFD700] flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
-                      <div className="ml-2">
-                        <ArrowRight size={24} className="text-[#0A1128]" />
-                      </div>
-                    </div>
+                  {/* Video Title */}
+                  <div className="absolute top-4 left-4 px-3 py-1 bg-black/70 backdrop-blur-sm rounded-full">
+                    <p className="text-xs text-white/90 font-medium">TEDx Talk Preview</p>
                   </div>
                 </div>
               </div>
@@ -610,6 +771,45 @@ export default function AboutPage() {
 
         .delay-500 {
           animation-delay: 500ms;
+        }
+
+        /* Custom range input styling */
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+          background: rgba(255, 255, 255, 0.2);
+          height: 4px;
+          border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 16px;
+          width: 16px;
+          background: #D4AF37;
+          border-radius: 50%;
+          border: 2px solid white;
+          margin-top: -6px;
+        }
+
+        input[type="range"]::-moz-range-track {
+          background: rgba(255, 255, 255, 0.2);
+          height: 4px;
+          border-radius: 2px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+          height: 16px;
+          width: 16px;
+          background: #D4AF37;
+          border-radius: 50%;
+          border: 2px solid white;
         }
       `}</style>
     </div>
