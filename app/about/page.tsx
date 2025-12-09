@@ -544,7 +544,7 @@ export default function AboutPage() {
                 <div className="relative w-full h-full">
                   <video
                     ref={videoRef}
-                    src="/images/kabah.mp4"
+                    src="./images/kabah.mp4"
                     className="w-full h-full object-cover"
                     preload="metadata"
                     muted={isMuted}
