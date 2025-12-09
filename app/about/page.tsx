@@ -2,18 +2,32 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { SectionContainer } from "@/components/section-container"
 import { ArrowRight, ChevronUp, BookOpen, Film, Mic, GraduationCap, Globe, Heart } from "lucide-react"
 
+// Import your author image - update the path to your actual image
+import authorImage from "@/public/images/author.jpeg" // Change this to your image path
+
 export default function AboutPage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [floatingElements, setFloatingElements] = useState<Array<{left: string, top: string, delay: string, opacity: number}>>([])
 
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500)
     }
+
+    // Generate floating elements on client side only
+    const elements = Array.from({ length: 20 }).map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 5}s`,
+      opacity: Math.random() * 0.3 + 0.1,
+    }))
+    setFloatingElements(elements)
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
@@ -22,6 +36,8 @@ export default function AboutPage() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
+
+  const tedxLink = "https://www.ted.com/talks/sharbari_ahmed_between_the_kabah_sharif_and_a_hard_place?utm_campaign=tedspread&utm_medium=referral&utm_source=tedcomshare"
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
@@ -76,32 +92,101 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Right Column - Image Placeholder */}
+              {/* Right Column - Author Picture */}
               <div className="lg:w-3/5 relative group animate-slide-left">
                 <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500 animate-pulse"></div>
-                <div className="relative aspect-[4/3] bg-gradient-to-br from-[#0A1128] via-[#1A237E] to-[#283593] rounded-xl overflow-hidden shadow-2xl">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-                    <div className="relative z-10 space-y-6">
-                      <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 border-2 border-[#D4AF37]/30 flex items-center justify-center">
-                        <Globe className="text-[#D4AF37]" size={48} />
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-[#D4AF37] tracking-wider">PORTRAIT COMING SOON</p>
-                        <p className="text-white/70">Upload your portrait here</p>
-                      </div>
-                    </div>
-                    {/* Shine Effect */}
+                
+                <div className="relative aspect-square max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl">
+                  {/* Author Image */}
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={authorImage}
+                      alt="Sharbari Ahmed - Author, Filmmaker, Educator"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority
+                    />
+                    {/* Overlay Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
                   
-                  {/* Floating Elements */}
-                  <div className="absolute top-4 left-4 w-8 h-8 border border-[#D4AF37] rounded animate-pulse"></div>
-                  <div className="absolute bottom-4 right-4 w-6 h-6 border border-[#FFD700] rounded-full animate-pulse delay-500"></div>
+                  {/* Author Signature */}
+                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm px-6 py-3 rounded-full border border-[#D4AF37]/30">
+                    <p className="text-[#D4AF37] font-serif text-lg tracking-wider">Sharbari Ahmed</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
+
+        {/* Author Bio Section */}
+        <SectionContainer className="bg-gradient-to-b from-[#1A237E]/20 to-transparent relative overflow-hidden">
+          <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-up delay-300">
+            <div className="relative inline-block">
+              <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37]/10 to-[#FFD700]/10 rounded-full blur-lg"></div>
+              <h2 className="relative text-4xl md:text-5xl font-serif font-bold text-white mb-6">
+                About the Author
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              {/* Author Bio Text */}
+              <div className="space-y-6 text-left">
+                <div className="p-6 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-xl">
+                  <h3 className="text-2xl font-bold text-[#FFD700] mb-4">Writer & Storyteller</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    Sharbari Ahmed is an award-winning writer and filmmaker whose work explores the intersections of 
+                    South Asian history, diasporic identity, faith, and storytelling traditions. Her narratives 
+                    challenge stereotypes and center voices often marginalized in contemporary literature.
+                  </p>
+                </div>
+                
+                <div className="p-6 bg-gradient-to-br from-[#0A1128]/30 to-transparent border border-[#283593] rounded-xl">
+                  <h3 className="text-2xl font-bold text-[#FFD700] mb-4">Creative Vision</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    With a background spanning television writing, independent filmmaking, and literary fiction, 
+                    Sharbari brings a unique cinematic sensibility to her prose, creating vivid, emotionally resonant 
+                    stories that linger long after the final page.
+                  </p>
+                </div>
+              </div>
+
+              {/* Author Details */}
+              <div className="space-y-6">
+                <div className="p-6 bg-gradient-to-br from-[#1A237E]/40 to-[#0A1128]/40 border border-[#283593] rounded-xl backdrop-blur-sm">
+                  <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Heart className="text-[#D4AF37]" size={20} />
+                    Writing Philosophy
+                  </h4>
+                  <blockquote className="text-xl font-serif italic text-white/90 border-l-4 border-[#D4AF37] pl-4 py-2">
+                    "I write to understand the world, and in doing so, help others understand themselves."
+                  </blockquote>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-lg">
+                    <p className="text-2xl font-bold text-[#FFD700]">2</p>
+                    <p className="text-sm text-white/70">Published Books</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-lg">
+                    <p className="text-2xl font-bold text-[#FFD700]">25+</p>
+                    <p className="text-sm text-white/70">Short Stories</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-lg">
+                    <p className="text-2xl font-bold text-[#FFD700]">10+</p>
+                    <p className="text-sm text-white/70">Film Projects</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-lg">
+                    <p className="text-2xl font-bold text-[#FFD700]">50+</p>
+                    <p className="text-sm text-white/70">Students Mentored</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionContainer>
 
         {/* Main Content */}
         <SectionContainer className="bg-transparent relative overflow-hidden">
@@ -117,6 +202,26 @@ export default function AboutPage() {
             {/* Left Column - Navigation & Info */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-8 animate-fade-up">
+                {/* Author Photo Card */}
+                <div className="relative group overflow-hidden rounded-xl">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37] via-[#FFD700] to-[#D4AF37] opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+                  <div className="relative p-6 bg-[#0A1128]/80 backdrop-blur-sm border border-[#283593] rounded-xl">
+                    <div className="aspect-square mb-4 rounded-lg overflow-hidden">
+                      <Image
+                        src={authorImage}
+                        alt="Sharbari Ahmed"
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="text-center">
+                      <h4 className="font-bold text-white mb-1">Sharbari Ahmed</h4>
+                      <p className="text-sm text-[#D4AF37]">Writer • Filmmaker • Educator</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Quick Links */}
                 <div className="p-6 bg-gradient-to-br from-[#1A237E]/40 to-[#0A1128]/40 border border-[#283593] rounded-xl backdrop-blur-sm">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
@@ -286,24 +391,28 @@ export default function AboutPage() {
             <div className="relative group animate-slide-up">
               <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
               <div className="relative aspect-video bg-gradient-to-br from-[#0A1128] via-[#1A237E] to-[#283593] rounded-xl overflow-hidden shadow-2xl">
+                {/* Video Frame */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  <div className="text-center space-y-6">
-                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 border-2 border-[#D4AF37]/30 flex items-center justify-center">
-                      <Mic className="text-[#D4AF37]" size={36} />
+                  {/* YouTube Embed - Replace with actual embed code if available */}
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-center space-y-6 max-w-lg">
+                      <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 border-2 border-[#D4AF37]/30 flex items-center justify-center">
+                        <Mic className="text-[#D4AF37]" size={36} />
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-lg text-white/70">Watch My TEDx Talk</p>
+                        <p className="text-sm text-white/50">Available on TED.com</p>
+                      </div>
+                      <Link
+                        href={tedxLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold rounded-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all duration-300"
+                      >
+                        Watch on TED.com
+                        <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                      </Link>
                     </div>
-                    <div className="space-y-3">
-                      <p className="text-lg text-white/70">TEDx Video Coming Soon</p>
-                      <p className="text-sm text-white/50">Video embed will appear here</p>
-                    </div>
-                    <Link
-                      href="https://www.ted.com/talks/sharbari_ahmed_between_the_kabah_sharif_and_a_hard_place"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-3 text-[#D4AF37] hover:text-[#FFD700] transition-colors font-medium"
-                    >
-                      Watch on TED.com
-                      <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
-                    </Link>
                   </div>
                   
                   {/* Play Button Overlay */}
@@ -324,6 +433,15 @@ export default function AboutPage() {
                 In this deeply personal talk, I explore the spaces between faith and doubt, tradition and modernity,
                 heritage and individuality—sharing stories that challenge assumptions about identity and belonging.
               </p>
+              <Link
+                href={tedxLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#FFD700] transition-colors font-medium text-sm"
+              >
+                Watch the full talk on TED.com
+                <ArrowRight size={16} />
+              </Link>
             </div>
           </div>
         </SectionContainer>
@@ -332,15 +450,15 @@ export default function AboutPage() {
         <SectionContainer className="bg-gradient-to-br from-[#0A1128] via-[#1A237E]/30 to-[#0A1128] relative overflow-hidden">
           {/* Floating Elements */}
           <div className="absolute inset-0">
-            {Array.from({ length: 20 }).map((_, i) => (
+            {floatingElements.map((element, i) => (
               <div
                 key={i}
                 className="absolute w-2 h-2 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full animate-float"
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  opacity: Math.random() * 0.3 + 0.1,
+                  left: element.left,
+                  top: element.top,
+                  animationDelay: element.delay,
+                  opacity: element.opacity,
                 }}
               />
             ))}

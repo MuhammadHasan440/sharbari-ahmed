@@ -2,19 +2,26 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Menu, X, Book, Film, MessageSquare, User, ChevronDown, Home } from "lucide-react"
+import { Menu, X, Book, Film, MessageSquare, User, ChevronDown, Home, ArrowRight } from "lucide-react"
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
     }
 
     window.addEventListener("scroll", handleScroll)
+    
+    // Initial check
+    handleScroll()
+    
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -56,6 +63,20 @@ export function Header() {
     { label: "Services", href: "/#offerings" },
     { label: "Substack", href: "https://sharbariahmed.substack.com", external: true },
   ]
+
+  // Don't render animated dots on server to avoid hydration mismatch
+  const renderAnimatedDots = () => {
+    if (!isClient) return null
+    
+    return (
+      <>
+        <span className="absolute top-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse"></span>
+        <span className="absolute top-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-200"></span>
+        <span className="absolute bottom-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-400"></span>
+        <span className="absolute bottom-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-600"></span>
+      </>
+    )
+  }
 
   return (
     <>
@@ -265,15 +286,8 @@ export function Header() {
               ) : (
                 <Menu size={24} className="text-white" />
               )}
-              {/* Animated dots */}
-              {!isOpen && (
-                <>
-                  <span className="absolute top-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse"></span>
-                  <span className="absolute top-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-200"></span>
-                  <span className="absolute bottom-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-400"></span>
-                  <span className="absolute bottom-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-600"></span>
-                </>
-              )}
+              {/* Conditionally render animated dots only on client */}
+              {!isOpen && renderAnimatedDots()}
             </button>
           </div>
 
@@ -344,8 +358,21 @@ export function Header() {
           }
         }
 
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+
         .animate-slide-down {
           animation: slide-down 0.3s ease-out;
+        }
+
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         /* Custom scrollbar */
@@ -369,21 +396,3 @@ export function Header() {
     </>
   )
 }
-
-// ArrowRight icon component (you can import it from lucide-react if not already)
-const ArrowRight = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M5 12h14" />
-    <path d="m12 5 7 7-7 7" />
-  </svg>
-)
