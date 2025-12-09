@@ -9,6 +9,11 @@ import { ArrowRight, BookOpen, Star, ChevronUp, ExternalLink } from "lucide-reac
 
 export default function BooksPage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,10 +37,26 @@ export default function BooksPage() {
       year: "2013",
       awards: ["Lambda Literary Award Finalist", "Asian American Literary Award Nominee"],
       links: [
-        { name: "ThriftBooks", url: "#" },
-        { name: "Amazon", url: "#" },
-        { name: "Barnes & Noble", url: "#" },
-        { name: "Amazon (short link)", url: "#" },
+        { 
+          name: "ThriftBooks", 
+          url: "https://www.thriftbooks.com/w/the-strangest-of-fruit-collected-stories/56953199/",
+          color: "from-[#1A237E] to-[#283593]"
+        },
+        { 
+          name: "Amazon", 
+          url: "https://www.amazon.com/Strangest-Fruit-Collected-Stories/dp/B0FRW1688Q",
+          color: "from-[#FF9900] to-[#FFB74D]"
+        },
+        { 
+          name: "Barnes & Noble", 
+          url: "https://www.barnesandnoble.com/w/the-strangest-of-fruit-sharbari-ahmed/1148333148",
+          color: "from-[#2A623D] to-[#4CAF50]"
+        },
+        { 
+          name: "Amazon (short link)", 
+          url: "https://a.co/d/7bKGYJ7",
+          color: "from-[#FF9900] to-[#FFB74D]"
+        },
       ],
     },
     {
@@ -45,9 +66,42 @@ export default function BooksPage() {
         "A story of war, love, and unexpected tenderness—set in the aftermath of the 1971 Bangladesh Liberation War. Exploring themes of memory, loss, and reconciliation.",
       year: "2008",
       awards: ["Notable Book of the Year", "Featured in NYT Book Review"],
-      links: [{ name: "Amazon eBook", url: "#" }],
+      links: [{ 
+        name: "Amazon eBook", 
+        url: "https://www.amazon.com/Ocean-Mrs-Nagai-Stories-ebook/dp/B00CZKS2VW",
+        color: "from-[#FF9900] to-[#FFB74D]"
+      }],
     },
   ]
+
+  const publications = [
+    {
+      title: "Birds of Bengal",
+      venue: "The Massachusetts Review",
+      year: "2015",
+      url: "#"
+    },
+    {
+      title: "The Distance Between Two Points",
+      venue: "Granta Magazine",
+      year: "2018",
+      url: "#"
+    },
+    {
+      title: "Monsoon Letters",
+      venue: "The Paris Review",
+      year: "2020",
+      url: "#"
+    }
+  ]
+
+  // Deterministic floating elements positions
+  const floatingPositions = Array.from({ length: 15 }).map((_, i) => ({
+    left: (i * 6.7) % 100,
+    top: (i * 4.3) % 100,
+    delay: (i * 0.2) % 3,
+    opacity: 0.1 + ((i * 0.01) % 0.2)
+  }))
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
@@ -62,10 +116,12 @@ export default function BooksPage() {
             <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-[#D4AF37] to-transparent opacity-10 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-tr from-[#FFD700] to-transparent opacity-10 rounded-full blur-3xl animate-pulse delay-1000"></div>
             
-            {/* Floating Books */}
-            <div className="absolute top-1/4 right-1/4 opacity-10 animate-float">
-              <BookOpen size={80} className="text-[#FFD700]" />
-            </div>
+            {/* Floating Books - Only on client */}
+            {isClient && (
+              <div className="absolute top-1/4 right-1/4 opacity-10 animate-float">
+                <BookOpen size={80} className="text-[#FFD700]" />
+              </div>
+            )}
           </div>
 
           <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-up">
@@ -165,7 +221,7 @@ export default function BooksPage() {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#1A237E] to-[#283593] border border-[#283593] text-white rounded-lg hover:bg-gradient-to-r hover:from-[#D4AF37] hover:to-[#FFD700] hover:text-[#0A1128] hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:border-[#FFD700] transition-all duration-300"
+                          className={`group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${link.color} border border-[#283593] text-white rounded-lg hover:bg-gradient-to-r hover:from-[#D4AF37] hover:to-[#FFD700] hover:text-[#0A1128] hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:border-[#FFD700] transition-all duration-300`}
                         >
                           <span>{link.name}</span>
                           <ExternalLink size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -206,23 +262,7 @@ export default function BooksPage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 animate-fade-up delay-200">
-              {[
-                {
-                  title: "Birds of Bengal",
-                  venue: "The Massachusetts Review",
-                  year: "2015"
-                },
-                {
-                  title: "The Distance Between Two Points",
-                  venue: "Granta Magazine",
-                  year: "2018"
-                },
-                {
-                  title: "Monsoon Letters",
-                  venue: "The Paris Review",
-                  year: "2020"
-                }
-              ].map((pub, i) => (
+              {publications.map((pub, i) => (
                 <div 
                   key={i} 
                   className="group p-6 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-xl hover:border-[#D4AF37] hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] transition-all duration-300"
@@ -236,7 +276,9 @@ export default function BooksPage() {
                     </div>
                     <p className="text-white/70">{pub.venue}</p>
                     <Link 
-                      href="#" 
+                      href={pub.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-sm text-[#D4AF37] hover:text-[#FFD700] transition-colors"
                     >
                       Read Excerpt
@@ -251,21 +293,23 @@ export default function BooksPage() {
 
         {/* CTA Section */}
         <SectionContainer className="bg-gradient-to-br from-[#0A1128] via-[#1A237E]/30 to-[#0A1128] relative overflow-hidden">
-          {/* Floating Elements */}
-          <div className="absolute inset-0">
-            {Array.from({ length: 15 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-2 h-2 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full animate-float"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 3}s`,
-                  opacity: Math.random() * 0.2 + 0.1,
-                }}
-              />
-            ))}
-          </div>
+          {/* Floating Elements - Deterministic */}
+          {isClient && (
+            <div className="absolute inset-0">
+              {floatingPositions.map((pos, i) => (
+                <div
+                  key={i}
+                  className="absolute w-2 h-2 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full animate-float"
+                  style={{
+                    left: `${pos.left}%`,
+                    top: `${pos.top}%`,
+                    animationDelay: `${pos.delay}s`,
+                    opacity: pos.opacity,
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="text-center space-y-8 relative z-10 animate-fade-up">
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-white">Explore My Stories</h2>
@@ -296,15 +340,15 @@ export default function BooksPage() {
       <Footer />
 
       {/* Scroll to Top Button */}
-      <button
-        onClick={scrollToTop}
-        className={`fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-110 transition-all duration-300 transform ${
-          showScrollTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
-        }`}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp size={24} className="text-[#0A1128]" />
-      </button>
+      {isClient && showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-110 transition-all duration-300 transform opacity-0 animate-fade-in"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp size={24} className="text-[#0A1128]" />
+        </button>
+      )}
 
       <style jsx global>{`
         @keyframes fade-up {
@@ -315,6 +359,15 @@ export default function BooksPage() {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
           }
         }
 
@@ -362,6 +415,10 @@ export default function BooksPage() {
 
         .animate-fade-up {
           animation: fade-up 1s ease-out;
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out forwards;
         }
 
         .animate-slide-right {
