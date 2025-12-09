@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer"
 import { SectionContainer } from "@/components/section-container"
 import { ArrowRight, ChevronUp, BookOpen, Film, Mic, GraduationCap, Globe, Heart, Play, Pause, Volume2, VolumeX } from "lucide-react"
 
+
 // Import your author image - update the path to your actual image
 import authorImage from "@/public/images/author.jpeg" // Change this to your image path
 
@@ -19,11 +20,16 @@ export default function AboutPage() {
   const [duration, setDuration] = useState(0)
   const [isMuted, setIsMuted] = useState(true) // Start muted for autoplay
   const [volume, setVolume] = useState(0.7)
+  const [isClient, setIsClient] = useState(false)
+  const [showControls, setShowControls] = useState(true)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const progressBarRef = useRef<HTMLDivElement>(null)
+  const controlsTimeoutRef = useRef<NodeJS.Timeout>(null)
 
   useEffect(() => {
+    setIsClient(true)
+    
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500)
     }
@@ -61,7 +67,12 @@ export default function AboutPage() {
       }
     }
 
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+    }
   }, [])
 
   const scrollToTop = () => {
@@ -81,6 +92,7 @@ export default function AboutPage() {
         setIsPlaying(false)
       }
     }
+    showControlsTemporarily()
   }
 
   const toggleMute = () => {
@@ -92,6 +104,7 @@ export default function AboutPage() {
         setVolume(video.volume)
       }
     }
+    showControlsTemporarily()
   }
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +116,7 @@ export default function AboutPage() {
       setIsMuted(newVolume === 0)
       setVolume(newVolume)
     }
+    showControlsTemporarily()
   }
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -114,6 +128,7 @@ export default function AboutPage() {
       video.currentTime = percent * duration
       setCurrentTime(video.currentTime)
     }
+    showControlsTemporarily()
   }
 
   const formatTime = (time: number) => {
@@ -123,6 +138,45 @@ export default function AboutPage() {
   }
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0
+
+  const showControlsTemporarily = () => {
+    setShowControls(true)
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (isPlaying) {
+        setShowControls(false)
+      }
+    }, 3000)
+  }
+
+  const handleVideoClick = () => {
+    if (!showControls) {
+      showControlsTemporarily()
+    } else {
+      togglePlay()
+    }
+  }
+
+  // Don't render video controls on server to avoid hydration mismatch
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
+        <Header />
+        <main className="flex-1">
+          {/* Simple placeholder while hydrating */}
+          <div className="h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37] to-[#FFD700] animate-pulse"></div>
+              <p className="mt-4 text-white/70">Loading...</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
@@ -476,7 +530,16 @@ export default function AboutPage() {
             <div className="relative group animate-slide-up">
               <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
               
-              <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-black">
+              <div 
+                className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-black cursor-pointer"
+                onClick={handleVideoClick}
+                onMouseEnter={() => setShowControls(true)}
+                onMouseLeave={() => {
+                  if (isPlaying && !showControls) {
+                    setTimeout(() => setShowControls(false), 1000)
+                  }
+                }}
+              >
                 {/* Video Container */}
                 <div className="relative w-full h-full">
                   <video
@@ -492,54 +555,64 @@ export default function AboutPage() {
                     Your browser does not support the video tag.
                   </video>
                   
-                  {/* Video Overlay - Shows when paused */}
-                  {!isPlaying && (
+                  {/* Video Overlay - Shows when paused or controls hidden */}
+                  {(!isPlaying || !showControls) && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-center justify-center">
-                      <div className="text-center space-y-6">
-                        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/80 to-[#FFD700]/80 flex items-center justify-center shadow-2xl">
-                          <Play size={36} className="text-[#0A1128] ml-1" />
+                      <div className="text-center space-y-6 p-4">
+                        <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/80 to-[#FFD700]/80 flex items-center justify-center shadow-2xl">
+                          {!isPlaying ? (
+                            <Play size={24} className="text-[#0A1128] ml-1 md:size-36" />
+                          ) : (
+                            <div className="text-center">
+                              <p className="text-xs md:text-sm text-white/80">Tap to show controls</p>
+                            </div>
+                          )}
                         </div>
-                        <div className="space-y-2">
-                          <p className="text-lg font-bold text-white">Click to Play Preview</p>
-                          <p className="text-sm text-white/70">Watch the TEDx talk highlights</p>
-                        </div>
+                        {!isPlaying && (
+                          <div className="space-y-2">
+                            <p className="text-base md:text-lg font-bold text-white">Click to Play Preview</p>
+                            <p className="text-xs md:text-sm text-white/70">Watch the TEDx talk highlights</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
                   
-                  {/* Custom Video Controls */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                  {/* Custom Video Controls - Mobile responsive */}
+                  <div className={`absolute bottom-0 left-0 right-0 p-2 md:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-all duration-300 ${
+                    showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+                  }`}>
                     {/* Progress Bar */}
                     <div 
                       ref={progressBarRef}
-                      className="h-1.5 bg-white/30 rounded-full mb-3 cursor-pointer"
+                      className="h-1.5 md:h-2 bg-white/30 rounded-full mb-2 md:mb-3 cursor-pointer"
                       onClick={handleProgressClick}
                     >
                       <div 
                         className="h-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full relative"
                         style={{ width: `${progressPercent}%` }}
                       >
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg"></div>
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-white rounded-full shadow-lg"></div>
                       </div>
                     </div>
                     
-                    {/* Controls Bar */}
+                    {/* Controls Bar - Mobile responsive layout */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 md:gap-4 flex-1">
                         {/* Play/Pause Button */}
                         <button
                           onClick={togglePlay}
-                          className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                          className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
                         >
                           {isPlaying ? (
-                            <Pause size={20} className="text-white" />
+                            <Pause size={16} className="text-white md:size-20" />
                           ) : (
-                            <Play size={20} className="text-white ml-1" />
+                            <Play size={16} className="text-white ml-1 md:size-20" />
                           )}
                         </button>
                         
-                        {/* Volume Control */}
-                        <div className="flex items-center gap-2">
+                        {/* Volume Control - Hidden on mobile, shown on desktop */}
+                        <div className="hidden md:flex items-center gap-2">
                           <button
                             onClick={toggleMute}
                             className="w-8 h-8 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
@@ -561,29 +634,53 @@ export default function AboutPage() {
                           />
                         </div>
                         
+                        {/* Mobile Volume Button - Shows mute toggle on mobile */}
+                        <button
+                          onClick={toggleMute}
+                          className="md:hidden w-8 h-8 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+                        >
+                          {isMuted || volume === 0 ? (
+                            <VolumeX size={16} className="text-white" />
+                          ) : (
+                            <Volume2 size={16} className="text-white" />
+                          )}
+                        </button>
+                        
                         {/* Time Display */}
-                        <div className="text-sm text-white/80 font-mono">
+                        <div className="text-xs md:text-sm text-white/80 font-mono ml-auto md:ml-0">
                           {formatTime(currentTime)} / {formatTime(duration)}
                         </div>
                       </div>
                       
-                      {/* TED.com Link */}
+                      {/* TED.com Link - Mobile responsive */}
                       <Link
                         href={tedxLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold text-sm rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all"
+                        onClick={(e) => e.stopPropagation()}
+                        className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold text-sm rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all"
                       >
-                        Watch Full Talk
+                        Full Talk
                         <ArrowRight size={14} />
                       </Link>
                     </div>
                   </div>
                   
-                  {/* Video Title */}
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-black/70 backdrop-blur-sm rounded-full">
-                    <p className="text-xs text-white/90 font-medium">TEDx Talk Preview</p>
+                  {/* Video Title - Mobile responsive */}
+                  <div className="absolute top-2 left-2 md:top-4 md:left-4 px-2 py-1 md:px-3 md:py-1 bg-black/70 backdrop-blur-sm rounded-full">
+                    <p className="text-[10px] md:text-xs text-white/90 font-medium">TEDx Preview</p>
                   </div>
+
+                  {/* Mobile Full Talk Button - Shows at top on mobile */}
+                  <Link
+                    href={tedxLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute top-2 right-2 md:hidden px-3 py-1 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold text-xs rounded-lg"
+                  >
+                    Full
+                  </Link>
                 </div>
               </div>
             </div>
@@ -810,6 +907,20 @@ export default function AboutPage() {
           background: #D4AF37;
           border-radius: 50%;
           border: 2px solid white;
+        }
+
+        /* Touch-friendly video controls */
+        @media (max-width: 768px) {
+          video {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+          }
+          
+          .video-controls button {
+            min-height: 44px;
+            min-width: 44px;
+          }
         }
       `}</style>
     </div>

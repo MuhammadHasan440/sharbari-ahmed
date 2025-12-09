@@ -8,10 +8,10 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const [isClient, setIsClient] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
+    setMounted(true)
     
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -64,16 +64,23 @@ export function Header() {
     { label: "Substack", href: "https://sharbariahmed.substack.com", external: true },
   ]
 
-  // Don't render animated dots on server to avoid hydration mismatch
-  const renderAnimatedDots = () => {
-    if (!isClient) return null
-    
+  // Don't render anything until mounted to avoid hydration mismatch
+  if (!mounted) {
     return (
       <>
-        <span className="absolute top-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse"></span>
-        <span className="absolute top-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-200"></span>
-        <span className="absolute bottom-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-400"></span>
-        <span className="absolute bottom-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-600"></span>
+        <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#0A1128]/90 to-transparent backdrop-blur-md border-b border-[#283593]/30">
+          <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex justify-between items-center">
+              <div className="relative flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-2xl font-serif font-bold text-[#0A1128]">SA</span>
+                </div>
+              </div>
+              <div className="w-12 h-12"></div>
+            </div>
+          </nav>
+        </header>
+        <div className="h-20"></div>
       </>
     )
   }
@@ -280,14 +287,20 @@ export function Header() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="md:hidden relative w-12 h-12 bg-gradient-to-br from-[#1A237E] to-[#283593] border border-[#283593] rounded-lg flex items-center justify-center hover:border-[#D4AF37] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               {isOpen ? (
                 <X size={24} className="text-[#FFD700]" />
               ) : (
-                <Menu size={24} className="text-white" />
+                <>
+                  <Menu size={24} className="text-white" />
+                  {/* Animated dots - only rendered after mount */}
+                  <span className="absolute top-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse"></span>
+                  <span className="absolute top-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-200"></span>
+                  <span className="absolute bottom-2 left-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-400"></span>
+                  <span className="absolute bottom-2 right-2 w-1 h-1 bg-[#D4AF37] rounded-full animate-pulse delay-600"></span>
+                </>
               )}
-              {/* Conditionally render animated dots only on client */}
-              {!isOpen && renderAnimatedDots()}
             </button>
           </div>
 

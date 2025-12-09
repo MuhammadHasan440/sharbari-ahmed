@@ -1,11 +1,26 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ExternalLink, Mail, Twitter, Instagram, Linkedin, BookOpen, Film, MessageSquare, ArrowRight, PenTool, Heart } from "lucide-react"
 
 export function Footer() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
+  const [floatingElements, setFloatingElements] = useState<Array<{left: string, top: string, delay: string, opacity: number}>>([])
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    
+    // Generate floating elements on client side only
+    const elements = Array.from({ length: 8 }).map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 5}s`,
+      opacity: Math.random() * 0.1 + 0.05,
+    }))
+    setFloatingElements(elements)
+  }, [])
 
   const exploreLinks = [
     { label: "About", href: "/about", icon: null },
@@ -30,6 +45,28 @@ export function Footer() {
     { label: "Events", href: "/about#events" },
   ]
 
+  // Don't render floating elements on server
+  const renderFloatingElements = () => {
+    if (!isClient) return null
+    
+    return (
+      <>
+        {floatingElements.map((element, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full animate-float"
+            style={{
+              left: element.left,
+              top: element.top,
+              animationDelay: element.delay,
+              opacity: element.opacity,
+            }}
+          />
+        ))}
+      </>
+    )
+  }
+
   return (
     <>
       <footer className="relative bg-gradient-to-t from-[#0A1128] via-[#1A237E] to-[#0A1128] border-t border-[#283593] mt-20">
@@ -44,20 +81,9 @@ export function Footer() {
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-20"></div>
         
-        {/* Floating Elements */}
+        {/* Floating Elements - Client-side only */}
         <div className="absolute inset-0">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                opacity: Math.random() * 0.1 + 0.05,
-              }}
-            />
-          ))}
+          {renderFloatingElements()}
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
