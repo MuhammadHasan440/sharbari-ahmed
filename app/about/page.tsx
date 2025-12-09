@@ -14,7 +14,7 @@ import authorImage from "@/public/images/author.jpeg" // Change this to your ima
 
 export default function AboutPage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
-  const [floatingElements, setFloatingElements] = useState<Array<{left: string, top: string, delay: string, opacity: number}>>([])
+  const [floatingElements, setFloatingElements] = useState<Array<{ left: string, top: string, delay: string, opacity: number }>>([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -22,14 +22,14 @@ export default function AboutPage() {
   const [volume, setVolume] = useState(0.7)
   const [isClient, setIsClient] = useState(false)
   const [showControls, setShowControls] = useState(true)
-  
+
   const videoRef = useRef<HTMLVideoElement>(null)
   const progressBarRef = useRef<HTMLDivElement>(null)
   const controlsTimeoutRef = useRef<NodeJS.Timeout>(null)
 
   useEffect(() => {
     setIsClient(true)
-    
+
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500)
     }
@@ -44,16 +44,16 @@ export default function AboutPage() {
     setFloatingElements(elements)
 
     window.addEventListener("scroll", handleScroll)
-    
+
     // Initialize video controls
     const video = videoRef.current
     if (video) {
       const handleTimeUpdate = () => setCurrentTime(video.currentTime)
       const handleLoadedMetadata = () => setDuration(video.duration)
-      
+
       video.addEventListener('timeupdate', handleTimeUpdate)
       video.addEventListener('loadedmetadata', handleLoadedMetadata)
-      
+
       // Try to autoplay (muted)
       video.muted = true
       video.play().catch(() => {
@@ -189,7 +189,7 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#0A1128]/95 via-[#1A237E]/90 to-[#0A1128]/95"></div>
             <div className="absolute top-1/4 -left-32 w-96 h-96 bg-gradient-to-br from-[#D4AF37] to-transparent opacity-10 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-gradient-to-tr from-[#FFD700] to-transparent opacity-10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            
+
             {/* Grid Pattern */}
             <div className="absolute inset-0 opacity-5">
               <div className="absolute inset-0" style={{
@@ -210,13 +210,13 @@ export default function AboutPage() {
                     My<br />Journey
                   </h1>
                 </div>
-                
+
                 <div className="w-20 h-1 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] animate-expand"></div>
-                
+
                 <p className="text-xl text-white/90 leading-relaxed">
                   A writer, filmmaker, and educator shaped by the legacies and contradictions of migration.
                 </p>
-                
+
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="p-4 bg-[#1A237E]/50 border border-[#283593] rounded-lg backdrop-blur-sm">
@@ -233,7 +233,7 @@ export default function AboutPage() {
               {/* Right Column - Author Picture */}
               <div className="lg:w-3/5 relative group animate-slide-left">
                 <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500 animate-pulse"></div>
-                
+
                 <div className="relative aspect-square max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl">
                   {/* Author Image */}
                   <div className="relative w-full h-full">
@@ -248,7 +248,7 @@ export default function AboutPage() {
                     {/* Overlay Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
-                  
+
                   {/* Author Signature */}
                   <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm px-6 py-3 rounded-full border border-[#D4AF37]/30">
                     <p className="text-[#D4AF37] font-serif text-lg tracking-wider">Sharbari Ahmed</p>
@@ -268,24 +268,24 @@ export default function AboutPage() {
                 About the Author
               </h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
               {/* Author Bio Text */}
               <div className="space-y-6 text-left">
                 <div className="p-6 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-xl">
                   <h3 className="text-2xl font-bold text-[#FFD700] mb-4">Writer & Storyteller</h3>
                   <p className="text-white/80 leading-relaxed">
-                    Sharbari Ahmed is an award-winning writer and filmmaker whose work explores the intersections of 
-                    South Asian history, diasporic identity, faith, and storytelling traditions. Her narratives 
+                    Sharbari Ahmed is an award-winning writer and filmmaker whose work explores the intersections of
+                    South Asian history, diasporic identity, faith, and storytelling traditions. Her narratives
                     challenge stereotypes and center voices often marginalized in contemporary literature.
                   </p>
                 </div>
-                
+
                 <div className="p-6 bg-gradient-to-br from-[#0A1128]/30 to-transparent border border-[#283593] rounded-xl">
                   <h3 className="text-2xl font-bold text-[#FFD700] mb-4">Creative Vision</h3>
                   <p className="text-white/80 leading-relaxed">
-                    With a background spanning television writing, independent filmmaking, and literary fiction, 
-                    Sharbari brings a unique cinematic sensibility to her prose, creating vivid, emotionally resonant 
+                    With a background spanning television writing, independent filmmaking, and literary fiction,
+                    Sharbari brings a unique cinematic sensibility to her prose, creating vivid, emotionally resonant
                     stories that linger long after the final page.
                   </p>
                 </div>
@@ -369,7 +369,7 @@ export default function AboutPage() {
                   <ul className="space-y-3">
                     {['Who I Am', 'Literary & Cinematic Life', 'Education & Mentorship', 'TEDx Talk'].map((item) => (
                       <li key={item}>
-                        <a 
+                        <a
                           href={`#${item.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
                           className="text-white/70 hover:text-[#D4AF37] transition-colors flex items-center gap-2 group"
                         >
@@ -414,14 +414,14 @@ export default function AboutPage() {
                   </div>
                   <h2 className="text-4xl font-serif font-bold text-white">Who I Am</h2>
                 </div>
-                
+
                 <div className="space-y-6">
                   <p className="text-xl text-white/80 leading-relaxed font-light bg-gradient-to-r from-transparent via-[#1A237E]/20 to-transparent p-6 rounded-lg border-l-4 border-[#D4AF37]">
                     I am a writer, filmmaker, and educator shaped by the legacies and contradictions of migration. Born in
                     Bangladesh and raised across multiple worlds, my creative work sits at the intersection of South Asian
                     history, diasporic identity, faith, gender, and storytelling traditions.
                   </p>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                     <div className="p-6 bg-gradient-to-br from-[#1A237E]/30 to-transparent border border-[#283593] rounded-xl">
                       <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
@@ -453,7 +453,7 @@ export default function AboutPage() {
                   </div>
                   <h2 className="text-4xl font-serif font-bold text-white">A Literary & Cinematic Life</h2>
                 </div>
-                
+
                 <div className="space-y-6">
                   <p className="text-xl text-white/80 leading-relaxed">
                     My short story collection <em className="text-[#FFD700] not-italic">The Strangest of Fruit</em> has been praised by celebrated writers for
@@ -461,7 +461,7 @@ export default function AboutPage() {
                     <em className="text-[#FFD700] not-italic">The Ocean of Mrs. Nagai</em>, explores the aftermath of war and the tenderness that emerges from
                     rupture.
                   </p>
-                  
+
                   <div className="relative p-8 bg-gradient-to-r from-[#1A237E]/20 to-[#0A1128]/20 border border-[#283593] rounded-xl mt-8 overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#D4AF37]/10 to-transparent rounded-full blur-xl"></div>
                     <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
@@ -486,14 +486,14 @@ export default function AboutPage() {
                   </div>
                   <h2 className="text-4xl font-serif font-bold text-white">Educator, Mentor, Guide</h2>
                 </div>
-                
+
                 <div className="space-y-6">
                   <p className="text-xl text-white/80 leading-relaxed bg-gradient-to-r from-transparent via-[#1A237E]/20 to-transparent p-6 rounded-lg">
                     For years, I've mentored emerging writers—fiction and screenwriters alike—helping them shape their
                     stories with clarity, structure, and emotional depth. My students have gone on to publish books,
                     produce films, and enter top MFA programs.
                   </p>
-                  
+
                   <div className="p-6 bg-gradient-to-br from-[#0A1128] via-[#1A237E]/30 to-[#0A1128] border border-[#283593] rounded-xl mt-8">
                     <blockquote className="text-2xl font-serif italic text-center text-white/90 p-8">
                       "I teach not just craft, but courage."
@@ -528,8 +528,8 @@ export default function AboutPage() {
             {/* YouTube-like Video Player */}
             <div className="relative group animate-slide-up">
               <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
-              
-              <div 
+
+              <div
                 className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-black cursor-pointer"
                 onClick={handleVideoClick}
                 onMouseEnter={() => setShowControls(true)}
@@ -543,7 +543,7 @@ export default function AboutPage() {
                 <div className="relative w-full h-full">
                   <video
                     ref={videoRef}
-                    src="./videos/kabah.mp4"
+                    src="/videos/kabah.mp4"
                     className="w-full h-full object-cover"
                     preload="metadata"
                     muted={isMuted}
@@ -553,7 +553,8 @@ export default function AboutPage() {
                   >
                     Your browser does not support the video tag.
                   </video>
-                  
+
+
                   {/* Video Overlay - Shows when paused or controls hidden */}
                   {(!isPlaying || !showControls) && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-center justify-center">
@@ -576,25 +577,24 @@ export default function AboutPage() {
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Custom Video Controls - Mobile responsive */}
-                  <div className={`absolute bottom-0 left-0 right-0 p-2 md:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-all duration-300 ${
-                    showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-                  }`}>
+                  <div className={`absolute bottom-0 left-0 right-0 p-2 md:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-all duration-300 ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+                    }`}>
                     {/* Progress Bar */}
-                    <div 
+                    <div
                       ref={progressBarRef}
                       className="h-1.5 md:h-2 bg-white/30 rounded-full mb-2 md:mb-3 cursor-pointer"
                       onClick={handleProgressClick}
                     >
-                      <div 
+                      <div
                         className="h-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full relative"
                         style={{ width: `${progressPercent}%` }}
                       >
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-white rounded-full shadow-lg"></div>
                       </div>
                     </div>
-                    
+
                     {/* Controls Bar - Mobile responsive layout */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 md:gap-4 flex-1">
@@ -609,7 +609,7 @@ export default function AboutPage() {
                             <Play size={16} className="text-white ml-1 md:size-20" />
                           )}
                         </button>
-                        
+
                         {/* Volume Control - Hidden on mobile, shown on desktop */}
                         <div className="hidden md:flex items-center gap-2">
                           <button
@@ -632,7 +632,7 @@ export default function AboutPage() {
                             className="w-24 accent-[#D4AF37] cursor-pointer"
                           />
                         </div>
-                        
+
                         {/* Mobile Volume Button - Shows mute toggle on mobile */}
                         <button
                           onClick={toggleMute}
@@ -644,13 +644,13 @@ export default function AboutPage() {
                             <Volume2 size={16} className="text-white" />
                           )}
                         </button>
-                        
+
                         {/* Time Display */}
                         <div className="text-xs md:text-sm text-white/80 font-mono ml-auto md:ml-0">
                           {formatTime(currentTime)} / {formatTime(duration)}
                         </div>
                       </div>
-                      
+
                       {/* TED.com Link - Mobile responsive */}
                       <Link
                         href={tedxLink}
@@ -664,7 +664,7 @@ export default function AboutPage() {
                       </Link>
                     </div>
                   </div>
-                  
+
                   {/* Video Title - Mobile responsive */}
                   <div className="absolute top-2 left-2 md:top-4 md:left-4 px-2 py-1 md:px-3 md:py-1 bg-black/70 backdrop-blur-sm rounded-full">
                     <p className="text-[10px] md:text-xs text-white/90 font-medium">TEDx Preview</p>
@@ -702,6 +702,8 @@ export default function AboutPage() {
             </div>
           </div>
         </SectionContainer>
+
+
 
         {/* Call to Action */}
         <SectionContainer className="bg-gradient-to-br from-[#0A1128] via-[#1A237E]/30 to-[#0A1128] relative overflow-hidden">
@@ -743,9 +745,8 @@ export default function AboutPage() {
       {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
-        className={`fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-110 transition-all duration-300 transform ${
-          showScrollTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
-        }`}
+        className={`fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-110 transition-all duration-300 transform ${showScrollTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
+          }`}
         aria-label="Scroll to top"
       >
         <ChevronUp size={24} className="text-[#0A1128]" />
