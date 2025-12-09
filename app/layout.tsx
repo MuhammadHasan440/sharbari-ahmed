@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react"; // ✅ FIXED
-import "./globals.css"; // ✅ FIXED NAME (global.css → globals.css)
+import { Analytics } from "@vercel/analytics/react"; // ✅ Correct import
+import "./globals.css"; // ✅ Correct filename
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -19,30 +19,17 @@ export const metadata: Metadata = {
   generator: "v0.app",
   icons: {
     icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
+      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
+      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-icon.png",
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
         {/* DARK MODE HANDLER */}
         <script
@@ -53,17 +40,21 @@ export default function RootLayout({
                   const theme = localStorage.getItem('theme');
                   if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
                   }
-                } catch(e) {}
+                } catch(e) { console.error(e); }
               })();
             `,
           }}
         />
       </head>
 
-      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased`}>
+      <body
+        className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-white dark:bg-[#0A1128] text-black dark:text-white`}
+      >
         {children}
-        <Analytics /> {/* NOW CORRECT */}
+        <Analytics />
       </body>
     </html>
   );

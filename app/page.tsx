@@ -9,6 +9,11 @@ import { ArrowRight, Book, Film, Users, ChevronUp } from "lucide-react"
 
 export default function HomePage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +35,14 @@ export default function HomePage() {
     }
   }
 
+  // Predefined star positions to avoid hydration mismatch
+  const starPositions = Array.from({ length: 50 }).map((_, i) => ({
+    left: (i * 3.7) % 100, // Deterministic calculation
+    top: (i * 2.1) % 100, // Deterministic calculation
+    delay: (i * 0.1) % 5, // Deterministic calculation
+    opacity: 0.1 + ((i * 0.02) % 0.5) // Deterministic calculation
+  }))
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
       <Header />
@@ -44,21 +57,23 @@ export default function HomePage() {
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tr from-[#D4AF37] to-transparent opacity-10 rounded-full blur-3xl animate-pulse delay-1000"></div>
           </div>
 
-          {/* Animated Stars */}
-          <div className="absolute inset-0">
-            {Array.from({ length: 50 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-[1px] h-[1px] bg-white rounded-full animate-twinkle"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  opacity: Math.random() * 0.5 + 0.1,
-                }}
-              />
-            ))}
-          </div>
+          {/* Animated Stars - Only render on client */}
+          {isClient && (
+            <div className="absolute inset-0">
+              {starPositions.map((star, i) => (
+                <div
+                  key={i}
+                  className="absolute w-[1px] h-[1px] bg-white rounded-full animate-twinkle"
+                  style={{
+                    left: `${star.left}%`,
+                    top: `${star.top}%`,
+                    animationDelay: `${star.delay}s`,
+                    opacity: star.opacity,
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Hero Content */}
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fade-up">
@@ -91,10 +106,10 @@ export default function HomePage() {
                 <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
               </button>
               <button
-                onClick={() => scrollToSection("films")}
+                onClick={() => scrollToSection("offerings")}
                 className="group inline-flex items-center gap-3 px-10 py-4 bg-transparent border-2 border-[#D4AF37] text-[#D4AF37] font-semibold rounded-lg hover:bg-[#D4AF37] hover:text-[#0A1128] hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:scale-105 transition-all duration-300 transform"
               >
-                Watch My Films
+                View My Films
                 <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
               </button>
               <Link
@@ -212,7 +227,7 @@ export default function HomePage() {
                   </div>
 
                   <Link 
-                    href="/press" 
+                    href="/books" 
                     className="group inline-flex items-center gap-3 text-[#D4AF37] hover:text-[#FFD700] transition-colors duration-300 font-semibold text-lg"
                   >
                     Explore My Books
@@ -250,7 +265,7 @@ export default function HomePage() {
                 <p className="text-white/70 leading-relaxed mb-6">
                   Fiction and screenwriting that challenges narratives and explores cultural identity across continents.
                 </p>
-                <Link href="#work" className="inline-flex items-center gap-2 text-[#D4AF37] font-semibold group-hover:text-[#FFD700] transition-colors">
+                <Link href="/books" className="inline-flex items-center gap-2 text-[#D4AF37] font-semibold group-hover:text-[#FFD700] transition-colors">
                   Explore
                   <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
                 </Link>
@@ -265,7 +280,7 @@ export default function HomePage() {
                 <p className="text-white/70 leading-relaxed mb-6">
                   From short films to award-nominated adaptations, blending lyrical storytelling with character-driven narratives.
                 </p>
-                <Link href="#films" className="inline-flex items-center gap-2 text-[#D4AF37] font-semibold group-hover:text-[#FFD700] transition-colors">
+                <Link href="/films" className="inline-flex items-center gap-2 text-[#D4AF37] font-semibold group-hover:text-[#FFD700] transition-colors">
                   View Films
                   <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
                 </Link>
@@ -322,16 +337,16 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* Scroll to Top Button */}
-      <button
-        onClick={scrollToTop}
-        className={`fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-110 transition-all duration-300 transform ${
-          showScrollTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
-        }`}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp size={24} className="text-[#0A1128]" />
-      </button>
+      {/* Scroll to Top Button - Only render when needed */}
+      {isClient && showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-110 transition-all duration-300 transform opacity-0 animate-fade-in"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp size={24} className="text-[#0A1128]" />
+        </button>
+      )}
 
       <style jsx global>{`
         @keyframes fade-up {
@@ -446,7 +461,7 @@ export default function HomePage() {
         }
 
         .animate-fade-in {
-          animation: fade-in 1.5s ease-out;
+          animation: fade-in 0.3s ease-out forwards;
         }
 
         .animate-slide-up {
