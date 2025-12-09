@@ -525,164 +525,30 @@ export default function AboutPage() {
               <p className="text-xl text-white/70">Exploring identity, spirituality, and inherited stories</p>
             </div>
 
-            {/* YouTube-like Video Player */}
-            <div className="relative group animate-slide-up">
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
-
-              <div
-                className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-black cursor-pointer"
-                onClick={handleVideoClick}
-                onMouseEnter={() => setShowControls(true)}
-                onMouseLeave={() => {
-                  if (isPlaying && !showControls) {
-                    setTimeout(() => setShowControls(false), 1000)
-                  }
-                }}
-              >
-                {/* Video Container */}
-                <div className="relative w-full h-full">
-                  <video
-                    ref={videoRef}
-                    src="/videos/kabah.mp4"
-                    className="w-full h-full object-cover"
-                    preload="metadata"
-                    muted={isMuted}
-                    playsInline
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-
-
-                  {/* Video Overlay - Shows when paused or controls hidden */}
-                  {(!isPlaying || !showControls) && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-center justify-center">
-                      <div className="text-center space-y-6 p-4">
-                        <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37]/80 to-[#FFD700]/80 flex items-center justify-center shadow-2xl">
-                          {!isPlaying ? (
-                            <Play size={24} className="text-[#0A1128] ml-1 md:size-36" />
-                          ) : (
-                            <div className="text-center">
-                              <p className="text-xs md:text-sm text-white/80">Tap to show controls</p>
-                            </div>
-                          )}
-                        </div>
-                        {!isPlaying && (
-                          <div className="space-y-2">
-                            <p className="text-base md:text-lg font-bold text-white">Click to Play Preview</p>
-                            <p className="text-xs md:text-sm text-white/70">Watch the TEDx talk highlights</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Custom Video Controls - Mobile responsive */}
-                  <div className={`absolute bottom-0 left-0 right-0 p-2 md:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-all duration-300 ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-                    }`}>
-                    {/* Progress Bar */}
-                    <div
-                      ref={progressBarRef}
-                      className="h-1.5 md:h-2 bg-white/30 rounded-full mb-2 md:mb-3 cursor-pointer"
-                      onClick={handleProgressClick}
-                    >
-                      <div
-                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full relative"
-                        style={{ width: `${progressPercent}%` }}
-                      >
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-white rounded-full shadow-lg"></div>
-                      </div>
-                    </div>
-
-                    {/* Controls Bar - Mobile responsive layout */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 md:gap-4 flex-1">
-                        {/* Play/Pause Button */}
-                        <button
-                          onClick={togglePlay}
-                          className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-                        >
-                          {isPlaying ? (
-                            <Pause size={16} className="text-white md:size-20" />
-                          ) : (
-                            <Play size={16} className="text-white ml-1 md:size-20" />
-                          )}
-                        </button>
-
-                        {/* Volume Control - Hidden on mobile, shown on desktop */}
-                        <div className="hidden md:flex items-center gap-2">
-                          <button
-                            onClick={toggleMute}
-                            className="w-8 h-8 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
-                          >
-                            {isMuted || volume === 0 ? (
-                              <VolumeX size={16} className="text-white" />
-                            ) : (
-                              <Volume2 size={16} className="text-white" />
-                            )}
-                          </button>
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value={isMuted ? 0 : volume}
-                            onChange={handleVolumeChange}
-                            className="w-24 accent-[#D4AF37] cursor-pointer"
-                          />
-                        </div>
-
-                        {/* Mobile Volume Button - Shows mute toggle on mobile */}
-                        <button
-                          onClick={toggleMute}
-                          className="md:hidden w-8 h-8 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
-                        >
-                          {isMuted || volume === 0 ? (
-                            <VolumeX size={16} className="text-white" />
-                          ) : (
-                            <Volume2 size={16} className="text-white" />
-                          )}
-                        </button>
-
-                        {/* Time Display */}
-                        <div className="text-xs md:text-sm text-white/80 font-mono ml-auto md:ml-0">
-                          {formatTime(currentTime)} / {formatTime(duration)}
-                        </div>
-                      </div>
-
-                      {/* TED.com Link - Mobile responsive */}
-                      <Link
-                        href={tedxLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold text-sm rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all"
-                      >
-                        Full Talk
-                        <ArrowRight size={14} />
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Video Title - Mobile responsive */}
-                  <div className="absolute top-2 left-2 md:top-4 md:left-4 px-2 py-1 md:px-3 md:py-1 bg-black/70 backdrop-blur-sm rounded-full">
-                    <p className="text-[10px] md:text-xs text-white/90 font-medium">TEDx Preview</p>
-                  </div>
-
-                  {/* Mobile Full Talk Button - Shows at top on mobile */}
-                  <Link
-                    href={tedxLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute top-2 right-2 md:hidden px-3 py-1 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-[#0A1128] font-bold text-xs rounded-lg"
-                  >
-                    Full
-                  </Link>
-                </div>
-              </div>
-            </div>
+           {/* YouTube-like Video Player - Now with YouTube Embed */}
+<div className="relative group animate-slide-up">
+  <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+  
+  <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-black">
+    {/* YouTube Embed */}
+    <div className="relative w-full h-full">
+      <iframe
+        src="https://www.youtube.com/embed/qfyHTmv5JRk?si=Sfu6FeOUqzSLez_s"
+        title="YouTube video player - Between the Kabah Sharif and a Hard Place"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
+        className="w-full h-full"
+      />
+      
+      {/* Video Title */}
+      <div className="absolute top-4 left-4 px-3 py-1 bg-black/70 backdrop-blur-sm rounded-full">
+        <p className="text-xs text-white/90 font-medium">TEDx Talk</p>
+      </div>
+    </div>
+  </div>
+</div>
 
             {/* Talk Description */}
             <div className="max-w-3xl mx-auto text-center space-y-6 animate-fade-up delay-300">
