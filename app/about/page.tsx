@@ -165,7 +165,6 @@ export default function AboutPage() {
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0A1128] via-[#1A237E] to-[#0A1128] text-white">
         <Header />
         <main className="flex-1">
-          {/* Simple placeholder while hydrating */}
           <div className="h-screen flex items-center justify-center">
             <div className="text-center">
               <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4AF37] to-[#FFD700] animate-pulse"></div>
@@ -544,7 +543,7 @@ export default function AboutPage() {
                 <div className="relative w-full h-full">
                   <video
                     ref={videoRef}
-                    src="./images/kabah.mp4"
+                    src="./videos/kabah.mp4"
                     className="w-full h-full object-cover"
                     preload="metadata"
                     muted={isMuted}
