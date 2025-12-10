@@ -91,11 +91,9 @@ export function Footer() {
             {/* Branding */}
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-lg flex items-center justify-center shadow-lg">
-                  <span className="text-xl font-serif font-bold text-[#0A1128]">SA</span>
-                </div>
+               
                 <div>
-                  <h3 className="text-xl font-serif font-bold text-white">Sharbari Ahmed</h3>
+                  <img className="w-40" src="/images/logo.png" alt="" />
                   <p className="text-sm text-white/60">Writer • Filmmaker • Speaker</p>
                 </div>
               </div>
